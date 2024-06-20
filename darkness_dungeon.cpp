@@ -18,6 +18,7 @@ int x=0,y=0,z=0,lv=1,n; vector<vector<int>> B;
 EMSCRIPTEN_KEEPALIVE
 __attribute__((used, export_name("draw_main")))
 const char* draw_main(double m,double t,double w,int cc){
+  output = "";
   char c = cc;
   string dc = "You are in a dark dungeon.  If you get torch, You vision more spread.\n";
   string ope = "Openration Move: w,a,s,d Quit: q\n";
@@ -33,23 +34,22 @@ const char* draw_main(double m,double t,double w,int cc){
   //for (char c:hmw){ cout << c; cout.flush(); usleep(30000); } double w; cin >> w;
   //usleep(1500000);
   auto draw = [&dc,&ope](){
-    output += "\033[2J\033[1;1H";
     output += (dc + "(" + to_string(x) + "," + to_string(y) + ") Lv." + 
       to_string(z)+ "-" + to_string(lv) + "\n");
     for (int i(0);i < 7;++i){
       for (int k(0);k < 7;++k){
         if (abs(i-3)+abs(k-3)<=lv){
-          if (B[n/2+x+i-3][n/2+y+k-3]==0) output += "\e[47m  ";
-          else if (B[n/2+x+i-3][n/2+y+k-3]==1) output += "\e[44m  ";
-          else if (B[n/2+x+i-3][n/2+y+k-3]==2) output += "\e[42m  ";
-          else output += "\e[41m  ";
+          if (B[n/2+x+i-3][n/2+y+k-3]==0) output += "\033[37;47m00";
+          else if (B[n/2+x+i-3][n/2+y+k-3]==1) output += "\033[34;44m00";
+          else if (B[n/2+x+i-3][n/2+y+k-3]==2) output += "\033[32;42m00";
+          else output += "\033[31;41m00";
         }
-        else output += "\e[40m  ";
+        else output += "\033[30;40m00";
       }
       output += "\n";
     }
-    output += "\e[0m";
-    output += ope + "Operation? >> \n";
+    output += "\033[0m";
+    output += ope;
   };
   auto cant = [](int x,int y) -> bool {
     set<pair<int,int>> s; int z = 0;
@@ -130,7 +130,6 @@ const char* draw_main(double m,double t,double w,int cc){
   };
   if (!z) create();
   while(true){
-    cout <<"!" << c << endl;
     if (c=='q') break;
     int tx = x,ty = y;
     if (c=='w') --x;

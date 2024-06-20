@@ -15,11 +15,12 @@
         var t = parseFloat(prompt("How many times more torches do you place on the map? >> "));
         var w = parseFloat(prompt("How many times more walls do you place on the map? >> "));
         var c = 'e';
+        var cc = 'e';
         const ansiOutput = document.getElementById('output_ansi');
         const ansi_up = new AnsiUp();
         for (;;){
-          console.log(c[0]);
-          ansiOutput.innerHTML = ansi_up.ansi_to_html(UTF8ToString(Module['_draw_main'](m,t,w,c[0].charCodeAt(0))));
+          var str = ansi_up.ansi_to_html(UTF8ToString(Module['_draw_main'](m,t,w,c[0].charCodeAt(0))).replace(/\n/g, '<br>'));
+          ansiOutput.innerHTML = str.replace(/&lt;br&gt;/g,'<br>');
           // wasdqのいずれかのキーが押されるまで待ってcに押されたキーを代入
           c = await new Promise(resolve => {
             document.addEventListener('keydown', function keydown(e) {
