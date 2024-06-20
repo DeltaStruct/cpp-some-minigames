@@ -12,10 +12,13 @@ pair<int,int> root(vector<vector<pair<int,int>>>& UF,pair<int,int> x) noexcept {
 }
 
 string output;
+vector<vector<pair<int,int>>> UF;
+int x=0,y=0,z=0,lv=1,n; vector<vector<int>> B;
 
 EMSCRIPTEN_KEEPALIVE
 __attribute__((used, export_name("draw_main")))
-const char* draw_main(double m,double t,double w){
+const char* draw_main(double m,double t,double w,int cc){
+  char c = cc;
   string dc = "You are in a dark dungeon.  If you get torch, You vision more spread.\n";
   string ope = "Openration Move: w,a,s,d Quit: q\n";
   //for (char c:dc){ cout << c; cout.flush(); usleep(30000); }
@@ -29,8 +32,7 @@ const char* draw_main(double m,double t,double w){
   string hmw = "How many times more walls do you place on the map? >> ";
   //for (char c:hmw){ cout << c; cout.flush(); usleep(30000); } double w; cin >> w;
   //usleep(1500000);
-  int x=0,y=0,z=0,lv=1,n; vector<vector<int>> B;
-  auto draw = [&x,&y,&z,&n,&lv,&B,&dc,&ope](){
+  auto draw = [&dc,&ope](){
     output += "\033[2J\033[1;1H";
     output += (dc + "(" + to_string(x) + "," + to_string(y) + ") Lv." + 
       to_string(z)+ "-" + to_string(lv) + "\n");
@@ -47,10 +49,9 @@ const char* draw_main(double m,double t,double w){
       output += "\n";
     }
     output += "\e[0m";
-    output += ope + "Operation? >> ";
+    output += ope + "Operation? >> \n";
   };
-  vector<vector<pair<int,int>>> UF;
-  auto cant = [&UF,&B,&n](int x,int y) -> bool {
+  auto cant = [](int x,int y) -> bool {
     set<pair<int,int>> s; int z = 0;
     if (x!=0&&y!=0&&B[x-1][y-1]==1) ++z,s.emplace(root(UF,make_pair(x-1,y-1)));
     if (x!=0&&B[x-1][y]==1) ++z,s.emplace(root(UF,make_pair(x-1,y)));
@@ -62,7 +63,7 @@ const char* draw_main(double m,double t,double w){
     if (x!=n-1&&y!=n-1&&B[x+1][y+1]==1) ++z,s.emplace(root(UF,make_pair(x+1,y+1)));
     return z!=s.size();
   };
-  auto connect = [&UF,&B,&n](int x,int y) -> void {
+  auto connect = [](int x,int y) -> void {
     B[x][y] = 1;
     if (x!=0&&y!=0&&B[x-1][y-1]==1){
       auto a = root(UF,make_pair(x-1,y-1)),b = root(UF,make_pair(x,y));
@@ -98,7 +99,7 @@ const char* draw_main(double m,double t,double w){
     }
   };
   srand(time(NULL));
-  auto create = [&x,&y,&z,&lv,&n,&m,&t,&w,&B,&cant,&UF,&connect](){
+  auto create = [&m,&t,&w,&cant,&connect](){
     lv = 1,x = 0,y = 0,++z;
     n = z*m; n += 6+(1-n%2); B.assign(n,vector<int>(n,0));
     UF.assign(n,vector<pair<int,int>>(n,make_pair(-1,-1)));
@@ -127,21 +128,21 @@ const char* draw_main(double m,double t,double w){
       ++i,B[x][y] = 1;
     }
   };
-  create();
+  if (!z) create();
   while(true){
-    draw();
-    break;
-    string c; cin >> c;
-    if (c.size()!=1) continue;
-    if (c[0]=='q') break;
+    cout <<"!" << c << endl;
+    if (c=='q') break;
     int tx = x,ty = y;
-    if (c[0]=='w') --x;
-    if (c[0]=='a') --y;
-    if (c[0]=='s') ++x;
-    if (c[0]=='d') ++y;
+    if (c=='w') --x;
+    if (c=='a') --y;
+    if (c=='s') ++x;
+    if (c=='d') ++y;
     if (B[n/2+x][n/2+y]==1) x = tx,y = ty;
     if (B[n/2+x][n/2+y]==2) create();
     if (B[n/2+x][n/2+y]==3) ++lv,B[n/2+x][n/2+y] = 0;
+    draw();
+    break;
   }
+  cout << output << endl;
   return (output.c_str());
 }
