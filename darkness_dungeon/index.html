@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Darkness Dungeon</title>
+    <script src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.js"></script>
+  </head>
+  <body>
+    <div id="output_ansi"></div>
+    <script src="./a.out.js"></script>
+    <script>
+      Module.onRuntimeInitialized = async () => {
+        var m = parseFloat(prompt("How many times larger do you want the map? >> "));
+        var t = parseFloat(prompt("How many times more torches do you place on the map? >> "));
+        var w = parseFloat(prompt("How many times more walls do you place on the map? >> "));
+        var c = 'e';
+        var cc = 'e';
+        const ansiOutput = document.getElementById('output_ansi');
+        const ansi_up = new AnsiUp();
+        for (;;){
+          var str = ansi_up.ansi_to_html(UTF8ToString(Module['_draw_main'](m,t,w,c[0].charCodeAt(0))).replace(/\n/g, '<br>'));
+          ansiOutput.innerHTML = str.replace(/&lt;br&gt;/g,'<br>');
+          // wasdqのいずれかのキーが押されるまで待ってcに押されたキーを代入
+          c = await new Promise(resolve => {
+            document.addEventListener('keydown', function keydown(e) {
+              document.removeEventListener('keydown', keydown);
+              resolve(e.key);
+            });
+          });
+        }
+      };
+    </script>
+  </body>
+</html>
