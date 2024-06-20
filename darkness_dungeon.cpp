@@ -5,6 +5,8 @@
 #include <emscripten.h>
 using namespace std;
 
+// Release GitHub Pages
+
 // Union-Find amortized O(log N)
 pair<int,int> root(vector<vector<pair<int,int>>>& UF,pair<int,int> x) noexcept {
   if (UF[x.first][x.second].first==-1) return x;
