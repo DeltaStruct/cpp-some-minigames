@@ -11,50 +11,43 @@ pair<int,int> root(vector<vector<pair<int,int>>>& UF,pair<int,int> x) noexcept {
   return UF[x.first][x.second] = root(UF,UF[x.first][x.second]);
 }
 
-EM_JS(void,output_js,(const char* s),{
-  const ansiOutput = document.getElementById('cpp_output');
-  const ansi_up = new AnsiUp();
-  ansiOutput.innerHTML = ansi_up.ansi_to_html(UTF8ToString(s));
-});
+string output;
 
-EM_JS(int,ask_double,(const char* s),{
-  return parseFloat(prompt(UTF8ToString(s)));
-});
-
-int main(){
-  string output; auto send = [&output](){ output_js(output.c_str()); };
-  auto output_reset = [&output,&send](){ output = "\033[2J\033[1;1H"; send(); };
-  output_reset();
+EMSCRIPTEN_KEEPALIVE
+__attribute__((used, export_name("draw_main")))
+const char* draw_main(double m,double t,double w){
   string dc = "You are in a dark dungeon.  If you get torch, You vision more spread.\n";
   string ope = "Openration Move: w,a,s,d Quit: q\n";
-  for (char c:dc){ cout << c; cout.flush(); usleep(30000); }
-  usleep(800000);
+  //for (char c:dc){ cout << c; cout.flush(); usleep(30000); }
+  //usleep(800000);
   string hml = "How many times larger do you want the map? >> ";
-  for (char c:hml){ cout << c; cout.flush(); usleep(30000); } double m; cin >> m;
-  usleep(800000);
+  //for (char c:hml){ cout << c; cout.flush(); usleep(30000); } double m; cin >> m;
+  //usleep(800000);
   string hmt = "How many times more torches do you place on the map? >> ";
-  for (char c:hmt){ cout << c; cout.flush(); usleep(30000); } double t; cin >> t;
+  //for (char c:hmt){ cout << c; cout.flush(); usleep(30000); } double t; cin >> t;
+  //usleep(800000);
   string hmw = "How many times more walls do you place on the map? >> ";
-  for (char c:hmw){ cout << c; cout.flush(); usleep(30000); } double w; cin >> w;
-  usleep(1500000);
+  //for (char c:hmw){ cout << c; cout.flush(); usleep(30000); } double w; cin >> w;
+  //usleep(1500000);
   int x=0,y=0,z=0,lv=1,n; vector<vector<int>> B;
   auto draw = [&x,&y,&z,&n,&lv,&B,&dc,&ope](){
-    cout << "\033[2J\033[1;1H";
-    cout << dc << '(' << x << ',' << y << ") Lv." << z << '-' << lv << endl;
+    output += "\033[2J\033[1;1H";
+    output += (dc + "(" + to_string(x) + "," + to_string(y) + ") Lv." + 
+      to_string(z)+ "-" + to_string(lv) + "\n");
     for (int i(0);i < 7;++i){
       for (int k(0);k < 7;++k){
         if (abs(i-3)+abs(k-3)<=lv){
-          if (B[n/2+x+i-3][n/2+y+k-3]==0) cout << "\e[47m  ";
-          else if (B[n/2+x+i-3][n/2+y+k-3]==1) cout << "\e[44m  ";
-          else if (B[n/2+x+i-3][n/2+y+k-3]==2) cout << "\e[42m  ";
-          else cout << "\e[41m  ";
+          if (B[n/2+x+i-3][n/2+y+k-3]==0) output += "\e[47m  ";
+          else if (B[n/2+x+i-3][n/2+y+k-3]==1) output += "\e[44m  ";
+          else if (B[n/2+x+i-3][n/2+y+k-3]==2) output += "\e[42m  ";
+          else output += "\e[41m  ";
         }
-        else cout << "\e[40m  ";
+        else output += "\e[40m  ";
       }
-      cout << endl;
+      output += "\n";
     }
-    cout << "\e[0m";
-    cout << ope << "Operation? >> "; cout.flush();
+    output += "\e[0m";
+    output += ope + "Operation? >> ";
   };
   vector<vector<pair<int,int>>> UF;
   auto cant = [&UF,&B,&n](int x,int y) -> bool {
@@ -136,7 +129,9 @@ int main(){
   };
   create();
   while(true){
-    draw(); string c; cin >> c;
+    draw();
+    break;
+    string c; cin >> c;
     if (c.size()!=1) continue;
     if (c[0]=='q') break;
     int tx = x,ty = y;
@@ -148,4 +143,5 @@ int main(){
     if (B[n/2+x][n/2+y]==2) create();
     if (B[n/2+x][n/2+y]==3) ++lv,B[n/2+x][n/2+y] = 0;
   }
+  return (output.c_str());
 }

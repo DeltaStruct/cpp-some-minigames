@@ -20,6 +20,7 @@ int main(){
   usleep(800000);
   string hmt = "How many times more torches do you place on the map? >> ";
   for (char c:hmt){ cout << c; cout.flush(); usleep(30000); } double t; cin >> t;
+  usleep(800000);
   string hmw = "How many times more walls do you place on the map? >> ";
   for (char c:hmw){ cout << c; cout.flush(); usleep(30000); } double w; cin >> w;
   usleep(1500000);
