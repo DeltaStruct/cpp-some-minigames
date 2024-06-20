@@ -1,8 +1,5 @@
-#include <iostream>
-#include <vector>
-#include <set>
+#include <bits/stdc++.h>
 #include <unistd.h>
-#include <emscripten.h>
 using namespace std;
 
 // Union-Find amortized O(log N)
@@ -11,19 +8,8 @@ pair<int,int> root(vector<vector<pair<int,int>>>& UF,pair<int,int> x) noexcept {
   return UF[x.first][x.second] = root(UF,UF[x.first][x.second]);
 }
 
-EM_JS(void,output_js,(const char* s),{
-  const ansiOutput = document.getElementById('cpp_output');
-  const ansi_up = new AnsiUp();
-  ansiOutput.innerHTML = ansi_up.ansi_to_html(UTF8ToString(s));
-});
-
-EM_JS(int,ask_double,(const char* s),{
-  return parseFloat(prompt(UTF8ToString(s)));
-});
-
 int main(){
-  string output; auto send = [&output](){ output_js(output.c_str()); };
-  auto output_reset = [&output,&send](){ output = "\033[2J\033[1;1H"; send(); };
+  auto output_reset = [](){ cout << "\033[2J\033[1;1H"; cout.flush(); };
   output_reset();
   string dc = "You are in a dark dungeon.  If you get torch, You vision more spread.\n";
   string ope = "Openration Move: w,a,s,d Quit: q\n";
